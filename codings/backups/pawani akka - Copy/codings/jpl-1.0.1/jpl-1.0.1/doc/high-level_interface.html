@@ -1,0 +1,772 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+   <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+   <META NAME="GENERATOR" CONTENT="Mozilla/4.07 [en] (X11; I; Linux 2.0.36 i686) [Netscape]">
+   <META NAME="Author" CONTENT="Fred Dushin">
+   <META NAME="Keywords" CONTENT="JPL,java,prolog">
+   <TITLE>High-Level Interface</TITLE>
+</HEAD>
+<BODY TEXT="#000000" BGCOLOR="#FFFFFF" LINK="#00009C" VLINK="#CE31CE" ALINK="#FF0000">
+
+<DIV ALIGN=right><A HREF="index.html">up</A>&nbsp;&nbsp;&nbsp;&nbsp; <A HREF="low-level_interface.html">prev</A>
+next&nbsp;&nbsp; <A HREF="api/packages.html">API</A>
+<HR NOSHADE WIDTH="100%"></DIV>
+
+<CENTER><B><FONT SIZE=+4>High-Level Interface</FONT></B></CENTER>
+
+<P><BR>
+<BR>
+<BR>
+<H3>
+Table of Contents</H3>
+
+<UL>
+<LI>
+<A HREF="#Introduction">Introduction</A></LI>
+
+<LI>
+<A HREF="#The Class Hierarchy">The Class Hierarchy</A></LI>
+
+<LI>
+<A HREF="#Initializing and Terminating Prolog">Initializing and Terminating
+Prolog</A></LI>
+
+<LI>
+<A HREF="#Creating Terms">Creating Terms</A></LI>
+
+<UL>
+<LI>
+<A HREF="#Atoms">Atoms</A></LI>
+
+<LI>
+<A HREF="#Variables">Variables</A></LI>
+
+<LI>
+<A HREF="#Integers">Integers</A></LI>
+
+<LI>
+<A HREF="#Longs">Longs</A></LI>
+
+<LI>
+<A HREF="#Floats">Floats</A></LI>
+
+<LI>
+<A HREF="#Strings">Strings</A></LI>
+
+<LI>
+<A HREF="#Compound Terms">Compound Terms</A></LI>
+
+<LI>
+<A HREF="#Lists">Lists</A></LI>
+
+<LI>
+<A HREF="#Tuples">Tuples</A></LI>
+</UL>
+
+<LI>
+<A HREF="#Creating Queries">Creating Queries</A></LI>
+
+<LI>
+<A HREF="#The Util Class">The Util Class</A></LI>
+
+<LI>
+<A HREF="#Querying Prolog">Querying Prolog</A></LI>
+
+<UL>
+<LI>
+<A HREF="#Obtaining one Solution">Obtaining One Solution</A></LI>
+
+<LI>
+<A HREF="#Obtaining all Solutions">Obtaining all Solutions</A></LI>
+
+<LI>
+<A HREF="#Ground Queries">Ground Queries</A></LI>
+
+<LI>
+<A HREF="#Terminating Queries">Terminating Queries</A></LI>
+</UL>
+
+<LI>
+<A HREF="#Multi-Threaded Queries">Multi-Threaded Queries</A></LI>
+
+<LI>
+<A HREF="#Exceptions">Exceptions</A></LI>
+
+<LI>
+<A HREF="#Debugging">Debugging</A></LI>
+
+<LI>
+<A HREF="#Version">Version</A></LI>
+
+<LI>
+<A HREF="#What's Missing">What's Missing</A></LI>
+</UL>
+
+<HR NOSHADE WIDTH="100%">
+<H3>
+<A NAME="Introduction"></A>Introduction</H3>
+The JPL High-Level interface provides a set of classes that hide most of
+all of the messy detail in the Low-Level interface.&nbsp; It is less flexible
+than the Low-Level interface, but it also carries with much less of a learning
+curve, and in many ways is more natural than the Low-Level interface.
+<P>The Java package jpl contains all of the classes in this interface.&nbsp;
+None of the classes correspond with any of the data types in the Prolog
+Foreign Language Interface (FLI); rather, they are introduced here in this
+interface.
+<BR>&nbsp;
+<H3>
+<A NAME="The Class Hierarchy"></A>The Class Hierarchy</H3>
+The High-Level interface consists of the following classes, as depicted
+in the following class hierarchy diagram:
+<BLOCKQUOTE>
+<BLOCKQUOTE>
+<BLOCKQUOTE>
+<PRE>Term --+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; +--- Atom --- List.Nil
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; +--- Variable
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; +--- Compound ---+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; +--- List
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; +--- Tuple --- Tuple.Pair
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; +--- Integer
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; +--- Long
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; +--- Float
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; +--- String
+
+Query
+
+JPLException --+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; +-- QueryInProgressException
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; +-- PrologException</PRE>
+</BLOCKQUOTE>
+</BLOCKQUOTE>
+</BLOCKQUOTE>
+For example, a <B>Pair</B> inherits from <B>Tuple</B>, which inherits from
+<B>Compound</B>,
+which inherits from <B>Term</B>.
+<BLOCKQUOTE><I><FONT SIZE=-1><B>Two Remarks.&nbsp;</B> A <B>Query</B> and
+a <B>Term</B> are unrelated hierachically, even though they are similar
+in structure.&nbsp; Also, The static class <B>List.Nil</B> is not a <B>List</B>;
+it's an <B>Atom</B>.</FONT></I></BLOCKQUOTE>
+
+<H3>
+<A NAME="Initializing and Terminating Prolog"></A>Initializing and Terminating
+Prolog</H3>
+The <B>JPL</B> class contains the following initialization and termination
+methods:
+<BLOCKQUOTE>
+<PRE>public void init();
+public void init( String argv[] );
+public void halt();</PRE>
+</BLOCKQUOTE>
+The String <B>init()</B> method passes the <B>String</B> arguments to the
+JPL Low-Level interface, which in turn passes the parameters to the Prolog
+Foreign Langauge Interface <I>initialise()</I> function.&nbsp; For details
+about the legal parameter values, see your local Prolog documentation.&nbsp;
+Most users will just call the parameterless <B>init()</B> method, which
+simply starts the Polog engine.
+<BLOCKQUOTE><I><FONT SIZE=-1><B>Note.&nbsp;</B> At least one of these initialization
+methods (or corresponding methdds in the Low-Level interface) must be called
+in order to use JPL.</FONT></I></BLOCKQUOTE>
+To terminate the Prolog session, use he <B>halt()</B> method.
+<BLOCKQUOTE><I><FONT SIZE=-1><B>Note.&nbsp;</B> The <B>halt()</B> method
+currently does nothing, since the Prolog implementation's halt function
+is currently broken.</FONT></I></BLOCKQUOTE>
+
+<H3>
+<A NAME="Creating Terms"></A>Creating Terms</H3>
+Creating a <B>Term</B> in the High-Level interface is much simpler than
+in the Low-Level interface; all the nitty gritty is handled for you automatically.&nbsp;
+All you really need to do is decide what kind of <B>Term</B> you want (the
+<B>Term</B>
+class is abstract, so it cannot be directly instantiated).
+<BLOCKQUOTE><FONT SIZE=-1><B><I>Note.</I></B> <I>A <B>Term</B> in the High-Level
+interface is not to be confused with a <B>term_t</B> in the Low-Level interface.&nbsp;
+The latter has an important role in managing state in the Prolog stack;
+the former is just a data structure in the Java heap.</I></FONT></BLOCKQUOTE>
+
+<H4>
+<A NAME="Atoms"></A>Atoms</H4>
+An <B>Atom</B> is a <B>Term</B> that has a name associated with it.&nbsp;
+To create an Atom, simply provide a name in the constructor:
+<BLOCKQUOTE>
+<PRE>Atom aristotle = new Atom( "aristotle" );
+Atom alexander = new Atom( "alexander" );</PRE>
+<I><FONT SIZE=-1><B>Note.</B>&nbsp; Two <B>Atom</B>s by the same name are
+effectively identical.&nbsp; Feel free to resuse references when constructing
+compound
+<B>Term</B>s.</FONT></I>
+<BR><I><FONT SIZE=-1><B>Note.</B>&nbsp; The name in an <B>Atom</B> need
+not be lower case, as is the convention in Prolog.&nbsp; Consider all names
+quoted.</FONT></I></BLOCKQUOTE>
+The <B>Atom</B> class has a <B>name()</B> accessor to obtain the name of
+the <B>Atom</B>.
+<H4>
+<A NAME="Variables"></A>Variables</H4>
+Unlike <B>Atom</B>s, <B>Variable</B>s do not have identifying names.&nbsp;
+However, creating an instance of a <B>Variable</B> is no more difficult:
+<BLOCKQUOTE>
+<PRE>Variable X = new Variable();</PRE>
+<FONT SIZE=-1><B><I>Note.</I></B> <I>The only (public) identifying information
+in a
+<B>Variable</B> is its address.&nbsp; Thus, reusing <B>Variable</B>
+references in the same way as <B>Atom</B>s may have unintended consequences.&nbsp;
+(See <A HREF="#Note.vars">below</A>).</I></FONT></BLOCKQUOTE>
+
+<H4>
+<A NAME="Integers"></A>Integers</H4>
+An <B>Integer</B> is a <B>Term</B> that holds a Java <B>int</B> value.&nbsp;
+This class corresponds to the Prolog integer type, on which arithmetic
+operations can be performed.
+<BLOCKQUOTE>
+<PRE>jpl.Integer i = new jpl.Integer( 5 );</PRE>
+<I><B>Note.</B><FONT SIZE=-1> Arithmetic operations are not currently supported
+in the High-Level interface.</FONT></I></BLOCKQUOTE>
+The <B>Integer</B> class has a <B>value()</B> accessor to obtain the <B>int</B>
+value of the <B>Integer</B>.
+<H4>
+<A NAME="Longs"></A>Longs</H4>
+An <B>Long</B> is a <B>Term</B> that holds a Java <B>long</B> value.&nbsp;
+This class corresponds to the Prolog long type, on which arithmetic operations
+can be performed.
+<BLOCKQUOTE>
+<PRE>jpl.Long el = new jpl.Long( 32768L );</PRE>
+<I><B>Note.</B><FONT SIZE=-1> Arithmetic operations are not currently supported
+in the High-Level interface.</FONT></I></BLOCKQUOTE>
+The <B>Long</B> class has a <B>value()</B> accessor to obtain the <B>long</B>
+value of the <B>Long</B>.
+<H4>
+<A NAME="Floats"></A>Floats</H4>
+An <B>Float</B> is a <B>Term</B> that holds a Java <B>double</B> value.&nbsp;
+This class corresponds to the Prolog float type, on which arithmetic operations
+can be performed.
+<BLOCKQUOTE>
+<PRE>jpl.Float f = new jpl.Float( 3.14159265 );</PRE>
+<I><B>Note.</B><FONT SIZE=-1> Arithmetic operations are not currently supported
+in the High-Level interface.</FONT></I></BLOCKQUOTE>
+The <B>Float</B> class has a <B>value()</B> accessor to obtain the <B>double</B>
+value of the <B>Float</B>.
+<H4>
+<A NAME="Strings"></A>Strings</H4>
+A <B>String</B> is a <B>Term</B> that holds a Java <B>java.lang.String</B>
+value.&nbsp; A JPL String represents a Prolog String, whose internal represenation
+may vary across Prolog implementations.&nbsp; For example, in many implementations
+a String is represented as a list of (small) integer values, given an encoding
+of characters (e.g., ASCII).
+<BLOCKQUOTE>
+<PRE>jpl.String s = new jpl.String( "Haddock's Eyes" );</PRE>
+<I><B>Note.</B><FONT SIZE=-1> Because a <B>jpl.String</B> and <B>java.lang.Strin</B>g
+both have the same name, you may find it awkward to import all of the classes
+in the jpl package and use <B>java.lang.String</B>s at the same time.&nbsp;
+My personal opinion is that imports of entire packages are a bad idea,
+anyway; you should always only import those classes in a package that you
+need.</FONT></I></BLOCKQUOTE>
+
+<H4>
+<A NAME="Compound Terms"></A>Compound Terms</H4>
+A <B>Compound</B> is a <B>Term</B> that contains an <B>Atom</B> (roughly
+corresponding to a <B>functor_t</B> in the Low-Level interface, but not
+quite), together with a collection (array) of <B>Term</B>s, as reflected
+in this class's constructor:
+<BLOCKQUOTE>
+<PRE>Term&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; args[]&nbsp; = { new Atom( "aristotle" ), new Atom( "alexander" ) };
+Compound teacher_of = new Compound( new Atom( "teacher_of", args );</PRE>
+</BLOCKQUOTE>
+In this example, the Java reference <B>teacher_of </B>points to a <B>Compound</B>
+structure, which corresponds with the Prolog term <I>teacher_of(alexander,aristotle).</I>
+<BLOCKQUOTE><A NAME="Note.vars"></A><I><FONT SIZE=-1><B>Note.</B> Care
+should be taken in creating
+<B>Compound</B> <B>Term</B>s, especially if
+<B>Variable</B>
+references are used.&nbsp; For example, the following construction:</FONT></I></BLOCKQUOTE>
+
+<BLOCKQUOTE>
+<BLOCKQUOTE>
+<PRE><I><FONT SIZE=-1>Variable&nbsp;&nbsp;&nbsp; X&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = new Variable();
+Variable&nbsp;&nbsp;&nbsp; Y&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = new Variable();
+Term&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; args[] = { X, Y };
+Compound father_of = new Compound( new Atom( "teacher_of", args );</FONT></I></PRE>
+</BLOCKQUOTE>
+<FONT SIZE=-1><I>corresponds with the Prolog term </I>teacher_of(X,Y)<I>,
+whereas</I></FONT>
+<BLOCKQUOTE>
+<PRE><I><FONT SIZE=-1>Variable&nbsp;&nbsp;&nbsp; X&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = new Variable();
+Term&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; args[] = { X, X };
+Compound father_of = new Compound( new Atom( "teacher_of", args );</FONT></I></PRE>
+</BLOCKQUOTE>
+<FONT SIZE=-1><I>corresponds with the Prolog term </I>teacher_of(X,X)<I>,
+two terms that can resolve very differently depending on the Prolog database.&nbsp;
+The general rule of thumb should be, reuse </I><B>Term</B><I> references
+that are or contain <B>Variable</B>s only if you know that that is what
+you mean.</I></FONT></BLOCKQUOTE>
+To obtain the <B>Atom</B> in the <B>Compound</B>, use the <B>atom()</B>
+accessor.&nbsp; To obtain the array of <B>Term</B>s, use the <B>args()</B>
+accessor.&nbsp; To obtain the <I>ith</I> element of a compount, use the
+<B>ith()
+</B>accessor.
+<BLOCKQUOTE>
+<PRE>public Term ith( int i );</PRE>
+</BLOCKQUOTE>
+Legal values for <B>i</B> are 0 through the arity of the <B>Compound</B>
+- 1.
+<P>The <B>Compound</B> class&nbsp; provides 10 additional convenience constructors
+of the form
+<BLOCKQUOTE>
+<PRE>public Compound( String name, Term t0, ..., Term tk );</PRE>
+</BLOCKQUOTE>
+where k &lt;= 9, allowing the creating of instances without having to explicitly
+create <B>Atom</B>s or <B>Term</B> arrays.&nbsp; For <B>Compound</B>s with
+greater than 10 terms, use the <B>Term[] </B>constructor.
+<H4>
+<A NAME="Lists"></A>Lists</H4>
+A <B>List</B> is a <B>Compound</B> with the special <B>Atom</B> "." and
+two <B>Term</B>s, a head and a tail.&nbsp; To create the Prolog list <I>[a,b,c]</I>,
+or, equivalently, <I>[a|[b|[c|[]]]]</I>, one would write:
+<BLOCKQUOTE>
+<PRE>List el =
+&nbsp;&nbsp;&nbsp; new List(
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; new Atom( "a" ),
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; new List(
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; new Atom( "b" ),
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; new List(
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; new Atom( "c" ),
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; new List.Nil() ) ) );</PRE>
+<I><FONT SIZE=-1><B>Note.&nbsp;</B> As with any <B>List</B> structure,
+the tail of a <B>List</B> need not itself be a <B>List</B>, though it is
+in the above example.&nbsp; Also note that the so-called "empty list",
+<B>List.Nil</B>,&nbsp;
+is not a <B>List</B> in Prolog or the High-Level interface; it's an <B>Atom</B>.</FONT></I></BLOCKQUOTE>
+The <B>List</B> class has a <B>head() </B>and <B>tail()</B> accessor to
+obtain the head and tail, respectively, of the <B>List</B>.
+<P>You can use the <B>elments() </B>method to obtain a <B>java.util.Enumeration</B>
+of all the <B>Term</B>s in a <B>List</B>:
+<BLOCKQUOTE>
+<PRE>java.util.Enumeration elts = el.elements();
+while ( elts.hasMoreElements() ){
+&nbsp;&nbsp;&nbsp; Term t = (Term) elts.nextElement();
+&nbsp;&nbsp;&nbsp; // process t...
+}</PRE>
+<I><FONT SIZE=-1><B>Note.</B>&nbsp; The <B>List</B> whose elements are
+obtained in this manner must be a <B>List.Nil</B>-terminated <B>List</B>.&nbsp;
+If it is not, a <B>JPLException</B> will be raised.&nbsp; See the <A HREF="#Exceptions">Exceptions</A>
+section for a description of JPL exception handling.</FONT></I></BLOCKQUOTE>
+The <B>List</B> class&nbsp; provides 10 additional convenience static factory
+methods of the form
+<BLOCKQUOTE>
+<PRE>public static List list( Term t0, ..., Term tk );</PRE>
+</BLOCKQUOTE>
+where k &lt;= 9, allowing the creating of instances without having to explicitly
+create <B>List</B> instances.&nbsp; These <B>List</B>s are always terminaled
+by the <B>List.NIL</B> static <B>List</B> instance of the <B>List.Nil</B>
+class.&nbsp; For <B>List</B>s with greater than 10 terms, use explicit
+<B>List</B>
+constructors.
+<H4>
+<A NAME="Tuples"></A>Tuples</H4>
+A <B>Tuple</B> is a <B>Compound</B> with the special <B>Atom</B> ",", together
+with a collection (array) of <I>at least</I> 2 <B>Term</B>s.&nbsp; To create
+the Prolog tuple
+<I>(a,b,c)</I>, for example, one could write
+<BLOCKQUOTE>
+<PRE>Term args[] = { new Atom( "a" ), new Atom( "b" ), new Atom( "c" ) };
+Tuple tuple = new Tuple( args );</PRE>
+</BLOCKQUOTE>
+Tuples are represented in Prolog as binary terms (with the<B> ,</B> functor),
+though this is largely hidden from the programmer.&nbsp; This is because
+in standard Prolog, for example, the terms <I>(a, b, c)</I> and <I>(a,
+(b, c))</I> unify.&nbsp; Indeed, in Prolog, any tuple of the form <I>(t<SUB>1</SUB>,
+..., t<SUB>n</SUB>)</I> is equivalent to <I>(t<SUB>1</SUB>, (t<SUB>2</SUB>,
+...(t<SUB>n-1</SUB>, t<SUB>n</SUB>)...)),</I> and JPL reflects this equivalence.&nbsp;
+Thus, in the following code snippent, <B>alpha</B> and <B>beta</B> are
+equivalent terms:
+<BLOCKQUOTE>
+<PRE>Tuple alpha =&nbsp;
+&nbsp;&nbsp;&nbsp; new Tuple(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; new Atom( "a" ),&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; new Atom( "b" ),&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; new Atom( "c" ) );
+Tuple beta&nbsp; =&nbsp;
+&nbsp;&nbsp;&nbsp; new Tuple(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; new Atom( "a" ),&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; new Tuple(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; new Atom( "b" ),&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; new Atom( "c" ) ) );</PRE>
+</BLOCKQUOTE>
+The <B>Tuple</B> class provides the <B>elt()</B> accessor method, which
+has the following signature:
+<BLOCKQUOTE>
+<PRE>public Term elt( int n );</PRE>
+</BLOCKQUOTE>
+This accessor returns the <I>nth </I><B>Term</B> in the tuple, counting
+from 0.&nbsp; Thus, in both <B>alpha</B> and <B>beta</B> above, <B>elt(
+1 )</B> returns a reference to the <B>Atom</B> "b".
+<BLOCKQUOTE><I><FONT SIZE=-1><B>Note.</B>&nbsp; The <B>elt() </B>method
+is not equivalent to the <B>ith()</B> method; due to the representation
+of a Tuple in Prolog, the <B>ith()</B> method, for any given Tuple, is
+only valid for inputs 0 and 1, whereas <B>elt()</B> is valid for inputs
+between 0 and the number of elements in the tuple - 1.</FONT></I></BLOCKQUOTE>
+A <B>Tuple.Pair</B> is just a 2-element <B>Tuple</B>.
+<P>The <B>Tuple</B> class&nbsp; provides 10 additional convenience constructors
+of the form
+<BLOCKQUOTE>
+<PRE>public Tuple( Term t0, ..., Term tk );</PRE>
+</BLOCKQUOTE>
+where 2 &lt;= k &lt;= 9, allowing the creating of instances without having
+to explicitly create <B>Term</B> arrays.&nbsp; For <B>Tuple</B>s with greater
+than 10 terms, use the <B>Term[] </B>constructor.
+<BR>&nbsp;
+<H3>
+<A NAME="Creating Queries"></A>Creating Queries</H3>
+A <B>Query</B> contains an <B>Atom</B>, corresponding to a Prolog predicate
+name, together with an array of <B>Term</B>s, corresponding to that predicate's
+arguments:
+<BLOCKQUOTE>
+<PRE>Term args[] = { new Atom( "aristotle" ), new Atom( "alexander" ) };
+Query&nbsp;&nbsp;&nbsp;&nbsp; q = new Query( new Atom( "teaches" ), args );</PRE>
+</BLOCKQUOTE>
+The <B>Query</B> <B>q</B> in this example corresponds to the Prolog query
+<BLOCKQUOTE><I>?- teaches(aristotle,alexander).</I></BLOCKQUOTE>
+which may or may not have a solution, depending on the database.
+<BLOCKQUOTE><I><FONT SIZE=-1><B>Note.</B>&nbsp; Though a <B>Query</B> is
+structurally similar to a <B>Compound</B>, a <B>Query</B> is not a <B>Term</B>.&nbsp;
+A <B>Query</B> is used to ask questions of the Prolog database; <B>Term</B>s
+are used as </FONT></I><FONT SIZE=-1>parts<I> of queries.</I></FONT></BLOCKQUOTE>
+The <B>Query</B> class&nbsp; provides 10 additional convenience constructors
+of the form
+<BLOCKQUOTE>
+<PRE>public Query( String name, Term t0, ..., Term tk );</PRE>
+</BLOCKQUOTE>
+where k &lt;= 9, allowing the creation of instances without having to explicitly
+create <B>Atom</B>s or <B>Term</B> arrays.&nbsp; For Queries with greater
+than 10 terms, use the <B>Term[] </B>constructor.
+<BR>&nbsp;
+<H3>
+<A NAME="The Util Class"></A>The Util Class</H3>
+The <B>Util</B> class provides a set of static utility methods for managing
+JPL Terms.
+<P>The <B>Util</B> class&nbsp; provides 10&nbsp; convenience static factory
+methods of the form
+<BLOCKQUOTE>
+<PRE>public static Term[] toTermArray( Term t0, ..., Term tk );</PRE>
+</BLOCKQUOTE>
+where k &lt;= 9, allowing the creation of <B>Term</B> arrays without having
+to explicitly do so.
+<P>Given a <B>Term</B> array, you can also create a <B>Term</B> which is
+either a <B>List</B> or an instance of <B>List.Nil</B>:
+<BLOCKQUOTE>
+<PRE>public static Term termArrayToList( Term[] t );</PRE>
+</BLOCKQUOTE>
+The return type of this method is deliberately general, and will typically
+require a cast.
+<H3>
+<A NAME="Querying Prolog"></A>Querying Prolog</H3>
+To as the Prolog engine a query, in the High-Level interface, one first
+constructs a <B>Query</B> instance, as in the above example, and then uses
+the <B>java.util.Enumeration</B> interface, which the <B>Query</B> class
+implements, to obtain solutions.
+<BLOCKQUOTE>
+<PRE>public interface Enumeration {
+&nbsp;&nbsp;&nbsp; public boolean hasMoreElements();
+&nbsp;&nbsp;&nbsp; public Object nextElement();
+}</PRE>
+</BLOCKQUOTE>
+The <B>hasMoreElements()</B> method can be used to determine whether a
+<B>Query</B>
+has any solutions.&nbsp; In the above example,
+<BLOCKQUOTE>
+<PRE>q.hasMoreElements();</PRE>
+</BLOCKQUOTE>
+is <B>true</B> if the Prolog query <I>teaches(aristotle,alexander)</I>
+evaluates to
+<I>true</I>, and is <B>false</B>, otherwise.&nbsp; In this
+example, the Prolog query is a ground term, so the "solution" to the <B>Query</B>
+(a truth value) is given by the <B>hasMoreElements()</B> method.
+<P>A solution for a <B>Query</B> with <B>Variable</B>s, on the other hand,
+is a binding of <B>Variable</B>s to <B>Term</B>s.&nbsp; The High-Level
+interface uses a <B>java.util.Hashtable</B> to represent these bindings;
+the <B>Object</B>s in the table are <B>Term</B>s, keyed (uniquely) by <B>Variable</B>
+instances.
+<P>For example, to print all of Aristotle's pupils, i.e., all the <B>Term</B>s
+that satisfy <I>teaches(aristotle,X)</I>, one could write
+<BLOCKQUOTE>
+<PRE>Variable&nbsp; X = new Variable();
+Term args[] = { new Atom( "aristotle" ), X };
+Query&nbsp;&nbsp;&nbsp;&nbsp; q = new Query( new Atom( "teaches" ), args );
+
+while ( q.hasMoreElements() ) {
+&nbsp;&nbsp;&nbsp; Hashtable binding = (Hashtable) q.nextElement();
+&nbsp;&nbsp;&nbsp; Term&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; t&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = (Term)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; binding.get( X );
+&nbsp;&nbsp;&nbsp; System.out.println( t );
+}</PRE>
+<I><FONT SIZE=-1><B>Note.</B>&nbsp; If there are no bindings as a result
+of a query, as, for example, in the case of a ground query, the <B>nextElement()
+</B>method
+will still return a <B>Hashtable</B>, though the table will be empty.</FONT></I>
+<BR><I><FONT SIZE=-1><B>Note.</B>&nbsp; If a <B>Query</B> has a list of
+<B>Term</B>s
+for arguments and there is more than 1 occurrence of the same
+<B>Variable</B>
+in the list of <B>Term</B>s, the <B>Hashtable</B> will have 1 binding for
+that <B>Variable</B>, if there are any solutions at all.&nbsp; This is
+consistent with the idea that <B>Variable</B>s are identified by their
+unique addresses, not by any other attributes.</FONT></I></BLOCKQUOTE>
+For convenience, the <B>Query</B> class provides a <B>hasMoreSolutions()</B>
+and <B>nextSolution() </B>method with the following signatures:
+<BLOCKQUOTE>
+<PRE>public boolean hasMoreSolutions();
+public Hashtable nextSolution();</PRE>
+</BLOCKQUOTE>
+Using the <B>nextSolution()</B> method avoids having to type-cast the result
+of the <B>nextElement() </B>method.
+<H4>
+<A NAME="Obtaining one Solution"></A>Obtaining one Solution</H4>
+Often, you'll just want just one solution to a query.&nbsp; The <B>Query</B>
+class provides a method for this:
+<BLOCKQUOTE>
+<PRE>public Hashtable oneSolution();</PRE>
+</BLOCKQUOTE>
+If the <B>Query</B> has no solutions, this method returns <B>null</B>;
+otherwise, a non-null return indicates success.&nbsp; If the <B>Query</B>
+is a ground query, the returned <B>Hashtable</B> will be empty (but not
+<B>null</B>).
+<H4>
+<A NAME="Obtaining all Solutions"></A>Obtaining all Solutions</H4>
+You may want all solutions to a query.&nbsp; The <B>Query</B> class provides
+a method for this:
+<BLOCKQUOTE>
+<PRE>public Hashtable[] allSolutions();</PRE>
+</BLOCKQUOTE>
+If the <B>Query</B> has no solutions, this method returns <B>null</B>;
+otherwise, a non-null return indicates success, and the returned array
+will have all the <B>Query</B>'s solutions, in the order they were received.
+<H4>
+<A NAME="Ground Queries"></A>Ground Queries</H4>
+Ground queries are queries which contain no variables.&nbsp; In most cases,
+the query will involve no backtracking.&nbsp; The <B>Query</B> class provides
+the <B>query</B> method for this purpose:
+<BLOCKQUOTE>
+<PRE>public boolean query();</PRE>
+</BLOCKQUOTE>
+This method is equivalent to calling <B>oneSolution</B> and asking whether
+the return value is <B>null</B> (the query failed) or non-<B>null</B> (the
+query succeeded).&nbsp; Use this method if you are only interested in knowing
+if one call to the query failed or not.
+<H4>
+<A NAME="Terminating Queries"></A>Terminating Queries</H4>
+Queries terminate automatically when the <B>hasMoreSolutions() </B>method
+returns <B>false</B>, and once a Query is terminatated, another can start.&nbsp;
+Unfortunately, the Prolog engine is currently such that it can handle only
+one query at a time.&nbsp; As a result, <I>it is not possible, in the High-Level
+interface, to ask two different Query objects whether they have any solutions
+without first exhausting all of the solutions of one.</I>&nbsp; Therefore,
+programmers must take care to ensure that all solutions are exhausted before
+starting new queries.&nbsp; This has particular importance in multi-threaded
+contexts, but it can also present difficulties even in single-threaded
+programs.&nbsp; See the <A HREF="#Multi-Threaded Queries">Multi-Threaded
+Queries</A> section for a discussion of how to manage Queries in multi-threaded
+contexts.
+<P>To terminate a Query before all of its solutions have been exhausted,
+use the <B>rewind()</B> method:
+<BLOCKQUOTE>
+<PRE>public void rewind();</PRE>
+</BLOCKQUOTE>
+This method stops a Query, setting it back into a state where it can be
+restarted.&nbsp; It also permits other queries to be started.&nbsp; Here
+is an example in which the first three solutions to the Query are obtained:
+<BLOCKQUOTE>
+<PRE>Query query = // obtain Query somehow
+for ( int i = 0;&nbsp; i &lt; 3 &amp;&amp; query.hasMoreSolutions();&nbsp; ++i ){
+&nbsp;&nbsp;&nbsp; Hashtable solution = query.nextSolution();
+&nbsp;&nbsp;&nbsp; // process solution...
+}
+query.rewind();</PRE>
+</BLOCKQUOTE>
+You may call <B>rewind()</B> on an inactive Query without ill-effect, and
+you should <I>always</I> call rewind if you have not exhaused all solutions
+to a Query.
+<P>If you are using the <B>query()</B>, <B>oneSolution()</B>, or <B>allSolutions()
+</B>methods,
+you need not worry about rewinding the Query; it is done automatically
+for you.
+<H3>
+<A NAME="Multi-Threaded Queries"></A>Multi-Threaded Queries</H3>
+The Prolog Engine can only have one query open at a time.&nbsp; This presents
+difficulties for multi-threaded programs in which the programmer has no
+control over when Queries are executed.&nbsp; JPL makes as much of the
+High-Level Interface thread-safe as it can.&nbsp; Unfortunately, the programmer
+must take repsonsibility in a limited set of circumstances to ensure that
+all calls to the High-Level Interface are thread safe.
+<P>It is worth noting that if the programmer confines use of Query methods
+to <B>query()</B>, <B>oneSolution()</B>, and <B>allSolutions()</B>, that
+subset of the Query interface <I>is</I> thread-safe.&nbsp; For many programmers,
+these methods suffice.&nbsp; However, if the <B>hasMoreSolutions()</B>,
+<B>hasMoreElements()</B>,
+<B>nextSolution()</B>,
+<B>nextElement()</B>,
+or <B>rewind()</B> methods are explicitly invoked, thread-safety is lost.&nbsp;
+The problem is that while the blocks of these programs are synchronized
+to the that in effect no two Query objects can invoke any of these methods
+concurrently, there is nothing that prevents a Query object in one thread
+from calling&nbsp; one of these methods, and another Query object in a
+different thread from calling this same method, or even another that could
+produce indeterminate results.
+<P>The Query class, however, does make synchronization around these methods
+possible by providing a reference to the monitor object that locks competing
+threads from executing critical code.&nbsp; The reference is obtained by
+the static method
+<BLOCKQUOTE>
+<PRE>public static Object lock();</PRE>
+</BLOCKQUOTE>
+Thus, programmers can wrap calls to these non-thread-safe methods in synchronized
+blocks, using the lock object to prevent other threads from entering any
+of these methods.&nbsp; To write a thread-safe loop to process all of a
+Query's solutions, for example, one might write
+<BLOCKQUOTE>
+<PRE>Query query = // obtain Query
+synchronized ( Query.lock() ){
+&nbsp;&nbsp;&nbsp; while ( query.hasMoreSolutions() ){
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Hashtable solution = query.nextSolution();
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // process solution...
+&nbsp;&nbsp;&nbsp; }
+}</PRE>
+</BLOCKQUOTE>
+
+<P><BR>Note that the <B>query()</B>, <B>oneSolution()</B>, and <B>allSolutions()
+</B>methods
+effectively do the same as the above code snippet, so there is no need
+to explicitly synchronized on the Query's monitor object when these methods
+are called.
+<BR>&nbsp;
+<H3>
+<A NAME="Exceptions"></A>Exceptions</H3>
+The JPL package provides fairly crude exception handling.&nbsp; The base
+class for all JPL Exceptions is <B>JPLException</B>, which is a <B>java.lang.RuntimeException</B>
+(and hence need not be declared), and which will be thrown in the absence
+of any other kind of exception that can be thrown, usually as the result
+of some programming error.&nbsp; Converting the exception to a <B>java.lang.String</B>
+should provide some descriptive information about the reason for the error.&nbsp;
+All other JPL excpetion classes extend this class.&nbsp; Currently there
+are two, the <B>QueryInProgressException</B> class and the <B>PrologException</B>
+class.
+<P>A <B>QueryInProgressException</B> is thrown when a <B>Query</B> is opened
+while another is in progress; this exception can be caught in multi-threaded
+situations, but a better strategy for managing multi-threaded situations
+is discussed in the <A HREF="#Multi-Threaded Queries">Multi-Threaded Queries</A>
+section.&nbsp; If you obey the rules discussed in this section, you should
+have no reason to catch this exception.
+<P>A <B>PrologException</B> is thrown as a result of a call, in Prolog
+to the Prolog predicate <I>throw/1.</I>&nbsp; You need only catch this
+exception if your prolog code makes explicit calls to this predicate.
+<P>There is currently no means of gracefully handling exceptions caused
+by malformed parameters (e.g., undefined predicates) passed through the
+High-Level Interface to the Prolog engine.
+<BR>&nbsp;
+<H3>
+<A NAME="Debugging"></A>Debugging</H3>
+Each <B>Term</B> type (together with the <B>Query</B> class) supports a
+version to <B>toString()</B> which more or less prints the expected Prolog
+representation a the <B>Term</B> or <B>Query</B>.&nbsp; Sometimes, however,
+this information is not sufficient, so we have provided a method <B>debugString()</B>
+which provides a more representative picture class instance.
+<P>In general, Terms and Queries are represented in the form (<I>type</I>
+<I>data</I>), where <I>type</I> is the name of the type (e.g., <B>Atom</B>,
+<B>Compound</B>, <B>Tuple</B>, etc.), and <I>data</I> is a representation
+of the contents of the <B>Term</B>.&nbsp; For example, if the <B>Term</B>
+is an <B>Atom</B>, the data is the <B>Atom</B>'s name.&nbsp; <B>Compounds</B>
+with sequences of Terms have comma-separated lists wrapped in square brackets
+('[' ']').
+<P>For example the value of the JPL expression
+<BLOCKQUOTE>
+<PRE>new Query(&nbsp;
+&nbsp;&nbsp;&nbsp; "foo",&nbsp;
+&nbsp;&nbsp;&nbsp; new Atom( "a" ),&nbsp;
+&nbsp;&nbsp;&nbsp; new Tuple(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; new String( "s" ),
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; new Integer( 1024 ),
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; new Float( 3.14159 ) ) ).debugString()</PRE>
+</BLOCKQUOTE>
+would be (linefeeds added for readability)
+<BLOCKQUOTE>
+<PRE>(Query (Atom foo) [
+&nbsp;&nbsp;&nbsp; (Atom a),&nbsp;
+&nbsp;&nbsp;&nbsp; (Tuple [
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (String s),&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (Tuple [
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (Integer 1024),&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (Float 3.14159)])])])</PRE>
+</BLOCKQUOTE>
+Viewing the structure of a Term or Query can be useful in determining whether
+an error lies on the Prolog or Java side of your JPL applications.
+<BR>&nbsp;
+<H3>
+<A NAME="Version"></A>Version</H3>
+To obtain the current version of JPL you are using, you may&nbsp; obtain
+a reference to the <B>jpl.Version</B> static instance off the JPL class
+by calling the <B>JPL.version() </B>static method.&nbsp; This will return
+a <B>jpl.Version</B> structure, which has the following final fields:
+<BLOCKQUOTE>
+<PRE>package jpl;
+public class Version {
+&nbsp;&nbsp;&nbsp; public final int major;
+&nbsp;&nbsp;&nbsp; public final int minor;
+&nbsp;&nbsp;&nbsp; public final int patch;
+&nbsp;&nbsp;&nbsp; public final java.lang.String status;
+}</PRE>
+</BLOCKQUOTE>
+You may wish to use this class instance to obtain fine-grained information
+about the current JPL version.
+<P>You may also simply call the <B>version_string() </B>static method of
+the <B>JPL</B> class.&nbsp; This will return a <B>java.lang.String</B>
+representation of the current JPL version.
+<P>The version can be printed to standard out by running the <B>main()</B>
+method of the <B>JPL</B> class.
+<BLOCKQUOTE>
+<PRE>linux% java jpl.JPL
+JPL 1.2.3-final</PRE>
+</BLOCKQUOTE>
+
+<H3>
+<A NAME="What's Missing"></A>What's Missing</H3>
+The current implementation of the High-Level interface is currently missing
+some features.&nbsp; In particular,
+<OL>
+<LI>
+Support for Prolog arithmetic operators</LI>
+
+<LI>
+Support for queries invloving whole clauses</LI>
+
+<LI>
+User-defined operators/precedences</LI>
+
+<LI>
+Module Support</LI>
+</OL>
+These issues will hopefully be dealt with in the near future.&nbsp; For
+now, Java programmers may use the Compound class, for example, to create
+Terms corresponding to clauses by using the Atom name ":-".&nbsp; Other
+tricks can be used for operators, or prgrammers may fall back on the low-level
+interface.
+<BR>&nbsp;
+<BR>&nbsp;
+<BR>&nbsp;
+<BR>&nbsp;
+<BR>&nbsp;
+<BR>&nbsp;
+<BR>&nbsp;
+<DIV ALIGN=right>
+<HR NOSHADE WIDTH="100%"><A HREF="index.html">up</A>&nbsp;&nbsp; <A HREF="low-level_interface.html">prev</A>&nbsp;
+next&nbsp; <A HREF="api/packages.html">API</A></DIV>
+
+</BODY>
+</HTML>

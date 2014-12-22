@@ -1,0 +1,238 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <meta name="GENERATOR" content="Mozilla/4.5 [en] (X11; I; Linux 2.1.24 ppc) [Netscape]">
+   <meta name="Author" content="Fred Dushin">
+   <meta name="Keywords" content="JPL,java,prolog">
+   <title>Getting Started</title>
+</head>
+<body text="#000000" bgcolor="#FFFFFF" link="#00009C" vlink="#CE31CE" alink="#FF0000">
+
+<div align=right><a href="index.html">up</a>&nbsp;&nbsp;&nbsp;&nbsp; prev&nbsp;
+<a href="low-level_interface.html">next</a>&nbsp;&nbsp;&nbsp;&nbsp; <a href="api/packages.html">API</a>
+<hr NOSHADE WIDTH="100%"></div>
+
+<center>
+<p><br><b><font size=+4>Getting Started</font></b></center>
+
+<p><br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<p>This section provides a tutorial introduction to JPL through the JPL
+High-Level interface, the interface most programmers are likely to use.&nbsp;
+The source code described here can be found in the demo directory of the
+JPL distribution.&nbsp; Feel free to consult the source files and run the
+demonstration program as you read this section.
+<h3>
+Creating a Prolog Database</h3>
+To experiment with JPL, we'll first create a Prolog database in a text
+file.&nbsp; We will eventually load this database into the Prolog engine,
+but we'll do so through the High-Level Interface.
+<p>Type the following in a text editor and save the result in a file called
+<i>test.pl.</i>
+<blockquote><font face="Courier New,Courier"><font size=+1>child_of( joe,
+ralf ).</font></font>
+<br><font face="Courier New,Courier"><font size=+1>child_of( mary, joe
+).</font></font>
+<br><font face="Courier New,Courier"><font size=+1>child_of( steve, joe
+).</font></font>
+<p><font face="Courier New,Courier"><font size=+1>descendent_of( X, Y )
+:-</font></font>
+<br><font face="Courier New,Courier"><font size=+1>&nbsp;&nbsp;&nbsp; child_of(
+X, Y ).</font></font>
+<br><font face="Courier New,Courier"><font size=+1>descendent_of( X, Y
+) :-</font></font>
+<br><font face="Courier New,Courier"><font size=+1>&nbsp;&nbsp;&nbsp; child_of(
+Z, Y ),</font></font>
+<br><font face="Courier New,Courier"><font size=+1>&nbsp;&nbsp;&nbsp; descendent_of(
+X, Z ).</font></font></blockquote>
+You may wish to load this database into an interactive Prolog session to
+experiment with the predicates in this database before experimenting with
+JPL.
+<h3>
+Initializing The Prolog Engine</h3>
+The <b>jpl.JPL</b> class provides a number of initialization methods for
+initializing the prolog environment from within the Java Virtual Machine.&nbsp;
+We will use the default (parameterless) initializtion method to start the
+Prolog engine.
+<blockquote><font face="Courier New,Courier"><font size=+1>JPL.init();</font></font>
+<p><b><i><font size=-1>Note.&nbsp;</font></i></b><i><font size=-1> You
+must initialize the Prolog engine via one of these initialization methods
+before using classes and methods in JPL.</font></i></blockquote>
+
+<h3>
+<font face="Courier New,Courier"><font size=+4>Consult</font></font>ing
+the Prolog File</h3>
+In an ordinary interactive Prolog session, we'd load the above Prolog Database
+using the Prolog <font face="Courier New,Courier"><font size=+1>consult</font></font>
+predicate, a built-in predicate in standard Prolog.&nbsp; Note, however,
+that as a Prolog predicate, "calling" <font face="Courier New,Courier"><font size=+1>consult</font></font>
+is just a special case of making a Prolog query.
+<p>Here is how we call consult in JPL:
+<blockquote><font face="Courier New,Courier"><font size=+1>Term consult_arg[]
+= {</font></font>
+<br><font face="Courier New,Courier"><font size=+1>&nbsp;&nbsp;&nbsp; new
+Atom( "test.pl" )</font></font>
+<br><font face="Courier New,Courier"><font size=+1>};</font></font>
+<br><font face="Courier New,Courier"><font size=+1>Query consult_query
+=</font></font>
+<br><font face="Courier New,Courier"><font size=+1>&nbsp;&nbsp;&nbsp; new
+Query(</font></font>
+<br><font face="Courier New,Courier"><font size=+1>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+new Atom( "consult" ),</font></font>
+<br><font face="Courier New,Courier"><font size=+1>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+consult_arg );</font></font>
+<p><font face="Courier New,Courier"><font size=+1>boolean consulted = consult_query.query();</font></font></blockquote>
+The consult <b>Query</b> consists of an <b>Atom</b>, corresponding to the
+name of the <font face="Courier New,Courier"><font size=+1>consult</font></font>
+Prolog predicate, together with another <b>Atom</b>, corresponding to the
+name of the file to be consulted.
+<p>We "invoke" or "run" the <b>Query</b> by calling its <b>query</b> method,
+which returns a <b>boolean</b>, indicating success or failure.
+<p>At this point, this process may seem a bit long-winded; however, you
+should soon see that the classes are sufficiently general that they provide
+a robust and powerful interface into the Prolog engine.
+<h3>
+Querying the Database</h3>
+Using the same technique, we can query the Prolog database about inferences
+it can make.&nbsp; To ask whether the Prolog query <font face="Courier New,Courier"><font size=+1>child_of(joe,ralf)
+</font></font>is true, given the above Prolog databse, for example, we
+write:
+<blockquote><font face="Courier New,Courier"><font size=+1>Term args[]
+= {</font></font>
+<br><font face="Courier New,Courier"><font size=+1>&nbsp;&nbsp;&nbsp; new
+Atom( "joe" ),</font></font>
+<br><font face="Courier New,Courier"><font size=+1>&nbsp;&nbsp;&nbsp; new
+Atom( "ralf" )</font></font>
+<br><font face="Courier New,Courier"><font size=+1>};</font></font>
+<br><font face="Courier New,Courier"><font size=+1>Query query =</font></font>
+<br><font face="Courier New,Courier"><font size=+1>&nbsp;&nbsp;&nbsp; new
+Query(</font></font>
+<br><font face="Courier New,Courier"><font size=+1>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+"child_of",</font></font>
+<br><font face="Courier New,Courier"><font size=+1>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+args );</font></font>
+<p><font face="Courier New,Courier"><font size=+1>System.out.println( "child_of(joe,ralf)
+= " + query.query() );</font></font></blockquote>
+To take an example that requires a bit more work on the part of the Prolog
+engine, on the other hand, we can ask whether <font face="Courier New,Courier"><font size=+1>descendent_of(steve,ralf)</font></font>
+is true via:
+<br>&nbsp;
+<blockquote><font face="Courier New,Courier"><font size=+1>Term args[]
+= {</font></font>
+<br><font face="Courier New,Courier"><font size=+1>&nbsp;&nbsp;&nbsp; new
+Atom( "steve" ),</font></font>
+<br><font face="Courier New,Courier"><font size=+1>&nbsp;&nbsp;&nbsp; new
+Atom( "ralf" )</font></font>
+<br><font face="Courier New,Courier"><font size=+1>};</font></font>
+<br><font face="Courier New,Courier"><font size=+1>Query query =</font></font>
+<br><font face="Courier New,Courier"><font size=+1>&nbsp;&nbsp;&nbsp; new
+Query(</font></font>
+<br><font face="Courier New,Courier"><font size=+1>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+"descendent_of",</font></font>
+<br><font face="Courier New,Courier"><font size=+1>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+args );</font></font>
+<p><font face="Courier New,Courier"><font size=+1>System.out.println( "descendent_of(steve,ralf)
+= " + query.query() );</font></font></blockquote>
+
+<h3>
+We Want Variables!</h3>
+Ground Queries are relatively straightforward things; their answers are
+either yes or no, and there is typically no backtracking involved in finding
+solutions.&nbsp; Once we throw variables into the equation, however, things
+start to get a bit more complicated.
+<p>JPL tries to make the transition as smooth as possible.&nbsp; Using
+the <b>Variable</b> class, we can obtain the <i>solution</i> to a <b>Query</b>
+in the form of a <b>java.util.Hashtable</b>.&nbsp; The <b>oneSolution</b>
+method of the <b>Query</b> class returns such a <b>Hashtable</b>, if the
+<b>Query</b>
+has a solution at all.
+<br>&nbsp;
+<blockquote><font face="Courier New,Courier"><font size=+1>Variable X =
+new Variable();</font></font>
+<br><font face="Courier New,Courier"><font size=+1>Term args[] = {</font></font>
+<br><font face="Courier New,Courier"><font size=+1>&nbsp;&nbsp;&nbsp; X,</font></font>
+<br><font face="Courier New,Courier"><font size=+1>&nbsp;&nbsp;&nbsp; new
+Atom( "ralf" )</font></font>
+<br><font face="Courier New,Courier"><font size=+1>};</font></font>
+<br><font face="Courier New,Courier"><font size=+1>Query query =</font></font>
+<br><font face="Courier New,Courier"><font size=+1>&nbsp;&nbsp;&nbsp; new
+Query(</font></font>
+<br><font face="Courier New,Courier"><font size=+1>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+"descendent_of",</font></font>
+<br><font face="Courier New,Courier"><font size=+1>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+args );</font></font>
+<p><font face="Courier New,Courier"><font size=+1>System.out.println( "querying
+descendent_of( X, ralf )" );</font></font>
+<br><font face="Courier New,Courier"><font size=+1>java.util.Hashtable
+solution =</font></font>
+<br><font face="Courier New,Courier"><font size=+1>&nbsp;&nbsp;&nbsp; query.oneSolution();</font></font>
+<br><font face="Courier New,Courier"><font size=+1>System.out.println(
+"X = " + solution.get( X ) );</font></font></blockquote>
+The <b>HashTable</b> contains solutions in the form of <b>Term</b>s, which
+are indexed by the <b>Variable</b> instances in the <b>Query</b>.&nbsp;
+These <b>Term</b>s are, in effect, the bindings that takes place as a result
+of unification.
+<p>The above query has the effect of finding the first (non-deterministic)
+solution.&nbsp; Often, however, one wants all solutions, or at least more
+than just the first.&nbsp; The <b>Query</b> class provides the <b>allSolutions</b>
+method, which returns an array of <b>Hashtable</b>s, each of which represents
+a given solution.
+<p>Equivalently, one obtains the solutions by exploiting the <b>Enumeration</b>
+interface, which the <b>Query</b> class implements.
+<blockquote><font face="Courier New,Courier"><font size=+1>Variable X =
+new Variable();</font></font>
+<br><font face="Courier New,Courier"><font size=+1>Term args[] = {</font></font>
+<br><font face="Courier New,Courier"><font size=+1>&nbsp;&nbsp;&nbsp; X,</font></font>
+<br><font face="Courier New,Courier"><font size=+1>&nbsp;&nbsp;&nbsp; new
+Atom( "ralf" )</font></font>
+<br><font face="Courier New,Courier"><font size=+1>};</font></font>
+<br><font face="Courier New,Courier"><font size=+1>Query query =</font></font>
+<br><font face="Courier New,Courier"><font size=+1>&nbsp;&nbsp;&nbsp; new
+Query(</font></font>
+<br><font face="Courier New,Courier"><font size=+1>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+"descendent_of",</font></font>
+<br><font face="Courier New,Courier"><font size=+1>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+args );</font></font>
+<p><font face="Courier New,Courier"><font size=+1>System.out.println( "querying
+descendent_of( X, ralf )" );</font></font>
+<p><font face="Courier New,Courier"><font size=+1>while ( query.hasMoreSolutions()
+){</font></font>
+<br><font face="Courier New,Courier"><font size=+1>&nbsp;&nbsp;&nbsp; java.util.Hashtable
+solution =</font></font>
+<br><font face="Courier New,Courier"><font size=+1>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+query.nextSolution();</font></font>
+<br><font face="Courier New,Courier"><font size=+1>&nbsp;&nbsp;&nbsp; System.out.println(
+"X = " + solution.get( X ) );</font></font>
+<br><font face="Courier New,Courier"><font size=+1>}</font></font></blockquote>
+The <b>hasMoreSolutions</b> method of the <b>Query</b> class returns a
+<b>boolean</b>, indicating whether there are any solutions "left" in the
+query.&nbsp; If the answer to this is 'yes', then the solution can be obtained
+in the form of a <b>Hashtable</b> by the <b>nextSolution</b> method.
+<blockquote><i><font size=-1><b>Note.</b>&nbsp; By calling <b>hasMoreSolutions</b>
+you are actually making the query to the Prolog engine; the "answer" to
+the query is cached in the <b>Query</b> class instance and returned from
+<b>nextSolution</b>.</font></i></blockquote>
+
+<h3>
+Where to Go From Here</h3>
+This section provides a brief tutorial on getting started with the High-Level
+Interface.&nbsp; You should read the <a href="high-level_interface.html">High-Level
+Interface</a> section for more information about using these interfaces.&nbsp;
+Feel free to consult the <a href="api/Package-jpl.html">API</a> section
+for detailed information about particular classes.
+<br>&nbsp;
+<br>&nbsp;
+<div align=right>
+<hr NOSHADE WIDTH="100%"><a href="index.html">up</a>&nbsp;&nbsp;&nbsp;&nbsp;
+prev&nbsp;&nbsp;&nbsp;&nbsp; <a href="low-level_interface.html">next&nbsp;</a>
+<a href="api/packages.html">API</a></div>
+
+</body>
+</html>

@@ -1,0 +1,24 @@
+#!/bin/sh
+
+status=$1
+major=$2
+minor=$3
+patch=$4
+
+
+echo status: $status
+echo major: $major
+echo minor: $minor
+echo patch: $patch
+
+distr=jpl-${major}.${minor}.${patch}
+path=EXPORT/$distr
+mkdir -p $path
+cvs export -r ${status}_${major}_${minor}_${patch} -d $path jpl
+cd EXPORT
+tar cvf $distr.tar $distr
+cp $distr.tar x
+gzip $distr.tar
+mv x $distr.tar
+#compress $distr.tar
+zip -r $distr.zip $distr

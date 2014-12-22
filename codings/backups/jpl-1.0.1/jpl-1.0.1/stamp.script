@@ -1,0 +1,27 @@
+#!/bin/sh
+
+status=$1
+major=$2
+minor=$3
+patch=$4
+
+
+echo status: $status
+echo major: $major
+echo minor: $minor
+echo patch: $patch
+
+cat > jsrc/jpl/Version.java <<EOF
+// \$Id: stamp.script,v 1.3 1999/01/28 16:40:49 fadushin Exp $
+package jpl;
+class Version
+{
+	public final java.lang.String status = "$status";
+	public final int    major            = $major;
+	public final int    minor            = $minor;
+	public final int    patch            = $patch;
+}
+EOF
+
+cvs commit
+cvs tag ${status}_${major}_${minor}_${patch}

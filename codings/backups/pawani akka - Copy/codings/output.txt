@@ -1,0 +1,1 @@
+Age(Peter,30)Skin(Smith,Black).

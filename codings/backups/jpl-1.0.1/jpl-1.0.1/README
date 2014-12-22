@@ -1,0 +1,80 @@
+
+
+                    JPL -- A Java Interface to Prolog
+                    ---------------------------------
+                              Fred Dushin
+                       <fadushin@top.cis.syr.edu>
+
+
+
+
+
+Description
+-----------
+
+JPL is a set of Java classes and C functions providing an interface
+between Java and Prolog.  JPL uses the Java Native Interface (JNI) to
+connect to a Prolog engine through the Prolog Foreign Language Interface
+(FLI), which is more or less in the process of being standardized in
+various implementations of Prolog.  JPL is not a pure Java implementation 
+of Prolog; it makes extensive use of native implementations of Prolog
+on supported platoforms.  The current version of JPL only works with
+SWI-Prolog.
+
+Currently, JPL only supports the embedding of a Prolog engine within the
+Java VM.  Future versions may support the embedding of a Java VM
+within Prolog, so that, for example, one could take advantage of
+the rich class structure of the Java environment from within Prolog.
+
+JPL is designed in two layers, a low-level interface to the Prolog
+FLI and a high-level Java interface for the Java programmer who
+is not concerned with the details of the Prolog FLI.  The
+low-level interface is provided for C programmers who may wish
+to port their C implementations which use the FLI to Java with
+minimal fuss.  See the file JPL.NOTES for more information.
+
+
+
+Directories
+-----------
+
+
+./jsrc   The Java source tree.  The directory structure of this
+         tree mirror the package structure of the Java classes.
+./src    The native C implementation of the JPL Prolog interface
+./lib    Java class files (in the classes directory), jar files,
+         zip files, and shared object files.
+./doc    Hand-written and Javadoc-generated documentation
+./test   Simple test scripts for testing the system.
+./demo   Simple demo program.  See the Getting Started section
+         of the manual for a description.
+
+
+
+License Information
+-------------------
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+See the file LICENSE.txt for more information.
+
+
+
+Contact Information
+-------------------
+
+JPL is written by Fred Dushin <fadushin@top.cis.syr.edu>.  
+
+The most recent version may be found via anonymous FTP at
+
+    ftp://ftp.cis.syr.edu/users/fadushin/software/jpl
+
+

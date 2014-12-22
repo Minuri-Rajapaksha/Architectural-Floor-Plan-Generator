@@ -1,0 +1,8 @@
+open('output.txt',write,In),
+    write(In,line(1,2)),
+    close(In).  
+
+
+open('output.txt',write,Out),
+    writeq(Out,line(1,2)),
+    close(Out). 

@@ -1,0 +1,53 @@
+
+
+    Build Instructions for JPL
+    --------------------------
+    
+    
+This file contains instructions for building JPL under SWI-Prolog.
+
+
+Requirements
+------------
+
+1. You will need  SWI-Prolog, version 3.0.0 or higher.  
+SWI-Prolog is available at the following site:
+
+    ftp://swi.psy.uva.nl/pub/SWI-Prolog
+    
+SWI-Prolog is free for non-commercial use.  Contact the author 
+(Jan Wielemaker) for commercial licenses.
+
+2. JPL uses the JNI for creating an interface between Java and Prolog,
+so you will need the JDK 1.1.x to build the system.
+
+3. The native implementation is built and tested with egcs 1.0.2, but
+nothing specific to egcs is used.  gcc 2.7.x should work fine.  In
+fact, any C compiler should work, but the Makefiles may need to be 
+tinkered with.
+
+JPL was built and tested under Linux 2.1.24 for the PowerPC.
+
+
+Instructions
+------------
+
+    1. You may need to modify the rules.mk file in the top level
+    directory.  Instructions for doing so are included in rules.mk
+    
+    2. Type
+    
+        make
+    
+    at the root directory of the source distribution.  This will build
+    the class, jar, zip, and .so files in the ./lib directory.
+    
+    That's it!  Should you choose to actually *use* this software,
+    you'll want to place the jar and .so files in a location appropriate
+    for your system.  There are no installation directives in the
+    supplied Makefiles.
+
+	To compile and run the test and demo prorgrams, first make sure the 
+	.jar and .so files are built and in a directory known to your CLASSPATH
+	and LD_LIBRARY_PATH, and type make in the appropriate directories.
+

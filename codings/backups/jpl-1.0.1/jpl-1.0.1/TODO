@@ -1,0 +1,30 @@
+
+
+                    JPL -- A Java Interface to Prolog
+                    ---------------------------------
+                              Fred Dushin
+                       <fadushin@top.cis.syr.edu>
+
+
+
+To Do
+-----
+
+    o Complete the definition of jpl.fli.Prolog.  My feeling is that
+    this class should mirror, as much as possible, the C header file
+    SWI-Prolog.h.  It should at least contain implementations of the
+    "standard" FLI functions.  This is easy -- it just needs to be done.
+	[Once this is done, I think we can remove the alpha release tag.]
+    
+    o Testing.  This stuff is barely tested.  We need people to run it
+    through the ropes, but the jpl.fli package and the jpl package.
+    
+    o Documentation.  It would be nice to have a real document explaining
+    the inner workings (even though it's really quite simple), in
+    addition to the interfaces.  Something more than the JPL.NOTES
+    I have (a start, at any rate), and something that complements the
+    javadoc stuff.  I suggest we do it in html.
+    
+    o Volunteers!  Right now I'm the only one working on this, but
+    I'm sure there is interest out there.  [If you're interested, please
+    let me know.  --Fred]
