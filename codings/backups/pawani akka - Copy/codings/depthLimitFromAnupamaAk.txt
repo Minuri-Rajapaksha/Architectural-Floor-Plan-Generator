@@ -1,3 +1,0 @@
-prove(true,N):-N>0.
-prove((Goal1,Goal2),N):-N>0,prove(Goal1,N),prove(Goal2,N).
-prove(Goal,D):-D>0,dif(true,Goal),X is D-1,write('call:'),write(Goal),nl,clause(Goal,Body),prove(Body,X),write('Exit:'),write(Goal),nl.
